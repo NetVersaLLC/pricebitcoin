@@ -1,0 +1,22 @@
+%form#main_form.mtgox_chosen
+  %label
+    %input#btc_count(type="text" name="btc_count" value="1")
+    BTC
+  %span
+    \=
+  %input#result(type="text" name="result")
+  %label#currency_label(for="result")
+    USD
+  %select#currency_chooser
+    %option(value="/mtgox/USD.json") USD
+    %option(value="/mtgox/EUR.json") EUR
+    %option(value="/mtgox/GBP.json") GBP
+    %option(value="/mtgox/CHF.json") CHF
+
+%footer
+  %label
+    %input.source_chooser(type="radio" value="mtgox" checked="checked" name="source")
+    MtGox
+  %label
+    %input.source_chooser(type="radio" value="bitstamp" name="source")
+    BitStamp

@@ -1,0 +1,1 @@
+../../views/javascripts/application.js
