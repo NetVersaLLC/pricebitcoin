@@ -72,22 +72,17 @@ def update_bitstamp
   pp @@bitstamp
 end
 
-#logger.info {'Bootstrapping rates data: MtGox'}
-update_mtgox
-#logger.info {'Bootstrapping rates data: BitStamp'}
-update_bitstamp
+def run_then_threadify
+  yield
 
-#logger.info {'Setting up tickers updating threads'}
-Thread.new do
-  while true
-    update_mtgox
-    sleep 1
+  Thread.new do
+    while true
+      sleep 1
+      yield
+    end
   end
 end
 
-Thread.new do
-  while true
-    update_bitstamp
-    sleep 1
-  end
+%w(mtgox bitstamp).map do |p|
+  run_then_threadify(&method(:"update_#{p}"))
 end
