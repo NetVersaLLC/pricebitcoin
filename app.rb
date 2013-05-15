@@ -18,6 +18,7 @@ set :haml, {:format => :html5} # default Haml format is :xhtml
 
 @@mtgox    = {:USD => false, :GBP => false, :CHF => false, :EUR => false}
 @@bitstamp = {:high => false, :low => false}
+@@btc_e    = {:USD => false, :EUR => false}
 
 # Application routes
 get '/' do
@@ -32,6 +33,15 @@ get '/mtgox/:currency.json' do
   if @@mtgox.keys.include? params[:currency].to_sym
     headers({'Content-Type' => 'application/x-json'})
     body({:rate => @@mtgox[params[:currency].to_sym]}.to_json)
+  else
+    halt 404
+  end
+end
+
+get '/btc_e/:currency.json' do
+  if @@btc_e.keys.include? params[:currency].to_sym
+    headers({'Content-Type' => 'application/x-json'})
+    body({:rate => @@btc_e[params[:currency].to_sym]}.to_json)
   else
     halt 404
   end
@@ -58,7 +68,6 @@ def update_mtgox
       #logger.info('MtGox') { "Successfully updated #{k} ticker!" }
     end
   end
-  pp @@mtgox
 end
 
 def update_bitstamp
@@ -69,7 +78,19 @@ def update_bitstamp
   resp = h.get uri.request_uri
   res       = JSON.parse resp.body
   @@bitstamp = {:high => res['high'], :low => res['low']}
-  pp @@bitstamp
+end
+
+def update_btce
+  @@btc_e.keys.each do |k|
+    p "BTC-E: Updating #{k} ticker..."
+    uri = URI("https://btc-e.com/api/2/btc_#{k.to_s.downcase}/ticker")
+    h = Net::HTTP.new uri.host, uri.port
+    h.use_ssl = true
+    resp = h.get uri.request_uri
+    res  = JSON.parse resp.body
+    @@btc_e[k] = res['ticker']['avg']
+  end
+  pp @@btc_e
 end
 
 def run_then_threadify
@@ -83,6 +104,6 @@ def run_then_threadify
   end
 end
 
-%w(mtgox bitstamp).map do |p|
+%w(mtgox bitstamp btce).map do |p|
   run_then_threadify(&method(:"update_#{p}"))
 end
