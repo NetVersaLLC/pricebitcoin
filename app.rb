@@ -65,7 +65,6 @@ def update_mtgox
     res  = JSON.parse resp.body
     if res['result'] == 'success'
       @@mtgox[k] = res['return']['avg']['value']
-      #logger.info('MtGox') { "Successfully updated #{k} ticker!" }
     end
   end
 end
@@ -90,20 +89,18 @@ def update_btce
     res  = JSON.parse resp.body
     @@btc_e[k] = res['ticker']['avg']
   end
-  pp @@btc_e
 end
 
-def run_then_threadify
-  yield
+
+%w(mtgox bitstamp btce).map do |p|
+  name = "update_#{p}".to_sym
+
+  send(name)
 
   Thread.new do
     while true
-      sleep 1
-      yield
+      sleep 2
+      send(name)
     end
   end
-end
-
-%w(mtgox bitstamp btce).map do |p|
-  run_then_threadify(&method(:"update_#{p}"))
 end
