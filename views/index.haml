@@ -5,18 +5,22 @@
   %span
     \=
   %input#result(type="text" name="result")
-  %label#currency_label(for="result")
+  %label#single_currency_label(for="result")
     USD
   %select#currency_chooser
-    %option(value="/mtgox/USD.json") USD
-    %option(value="/mtgox/EUR.json") EUR
-    %option(value="/mtgox/GBP.json") GBP
-    %option(value="/mtgox/CHF.json") CHF
+    %option(value="USD") USD
+    %option(value="EUR") EUR
+    %option(value="GBP") GBP
+    %option(value="CHF") CHF
 
 %footer
   %label
-    %input.source_chooser(type="radio" value="mtgox" checked="checked" name="source")
+    %input.source_chooser{:type=>'radio', :value=>'mtgox', :checked=>'checked', :name=>'source',
+      :data => {:source_uri_mask =>'/mtgox/%s.json', :currency_filter => 'USD EUR GBP CHF'}}
     MtGox
   %label
-    %input.source_chooser(type="radio" value="bitstamp" name="source")
+    %input.source_chooser(type="radio" value="bitstamp" name="source" data-source-uri-mask='/bitstamp.json' data-currency-filter='USD')
     BitStamp
+  %label
+    %input.source_chooser(type="radio" value="btce" name="source" data-source-uri-mask='/btc_e/%s.json' data-currency-filter="USD EUR")
+    BTC-E
